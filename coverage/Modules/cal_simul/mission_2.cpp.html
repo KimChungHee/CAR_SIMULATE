@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>mission_2.cpp</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+#ifdef _DEBUG
+#include "gmock/gmock.h"
+
+int main()
+<span style = "background-color:#dfd">{
+    testing::InitGoogleMock();
+    return RUN_ALL_TESTS();
+}</span>
+
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;memory&gt;
+#include &lt;cstdlib&gt;
+
+#define CLEAR_SCREEN "\033[H\033[2J"
+
+using namespace std;
+
+class Component {
+public:
+    virtual string name() const = 0;
+<span style = "background-color:#dfd">    virtual ~Component() = default;</span>
+};
+
+class Engine : public Component {
+    string type;
+public:
+<span style = "background-color:#dfd">    Engine(string t) : type(t) {}
+    string name() const override { return type; }</span>
+};
+
+class Brake : public Component {
+    string type;
+public:
+<span style = "background-color:#dfd">    Brake(string t) : type(t) {}
+    string name() const override { return type; }</span>
+};
+
+class Steering : public Component {
+    string type;
+public:
+<span style = "background-color:#dfd">    Steering(string t) : type(t) {}
+    string name() const override { return type; }</span>
+};
+
+class CarType : public Component {
+    string type;
+public:
+<span style = "background-color:#dfd">    CarType(string t) : type(t) {}
+    string name() const override { return type; }</span>
+};
+
+<span style = "background-color:#fdd">void clearScreen() {
+    printf(CLEAR_SCREEN);
+}</span>
+
+void delay(int ms)
+<span style = "background-color:#fdd">{
+    volatile int sum = 0;
+    for (int i = 0; i &lt; 1000; i++)</span>
+    {
+<span style = "background-color:#fdd">        for (int j = 0; j &lt; 1000; j++)</span>
+        {
+<span style = "background-color:#fdd">            for (int t = 0; t &lt; ms; t++)</span>
+            {
+<span style = "background-color:#fdd">                sum++;
+            }
+        }
+    }
+}</span>
+
+class Car {
+public:
+    shared_ptr&lt;CarType&gt; carType;
+    shared_ptr&lt;Engine&gt; engine;
+    shared_ptr&lt;Brake&gt; brake;
+    shared_ptr&lt;Steering&gt; steering;
+
+<span style = "background-color:#dfd">    bool isValid(string&amp; reason) const {
+        string t = carType-&gt;name(), e = engine-&gt;name();
+        string b = brake-&gt;name(), s = steering-&gt;name();</span>
+
+<span style = "background-color:#dfd">        if (b == "BOSCH" &amp;&amp; s != "BOSCH") { reason = "BOSCH Á¦µ¿ÀåÄ¡¿¡´Â BOSCH Á¶ÇâÀåÄ¡¸¸ »ç¿ë °¡´É."; return false; }
+        if (t == "Sedan" &amp;&amp; b == "CONTINENTAL") { reason = "Sedan¿¡´Â Continental Á¦µ¿ÀåÄ¡ »ç¿ë ºÒ°¡."; return false; }
+        if (t == "SUV" &amp;&amp; e == "TOYOTA") { reason = "SUV¿¡´Â TOYOTA ¿£Áø »ç¿ë ºÒ°¡."; return false; }
+        if (t == "Truck" &amp;&amp; e == "WIA") { reason = "Truck¿¡´Â WIA ¿£Áø »ç¿ë ºÒ°¡."; return false; }
+        if (t == "Truck" &amp;&amp; b == "MANDO") { reason = "Truck¿¡´Â MANDO Á¦µ¿ÀåÄ¡ »ç¿ë ºÒ°¡."; return false; }
+        return true;
+    }</span>
+
+<span style = "background-color:#dfd">    bool canRun(string&amp; reason) const {
+        if (engine-&gt;name() == "°íÀå³­ ¿£Áø") {
+            reason = "¿£ÁøÀÌ °íÀå³µ½À´Ï´Ù."; return false;</span>
+        }
+<span style = "background-color:#dfd">        return isValid(reason);
+    }</span>
+};
+
+<span style = "background-color:#dfd">map&lt;string, vector&lt;string&gt;&gt; componentOptions = {</span>
+    {"CarType", {"Sedan", "SUV", "Truck"}},
+    {"Engine", {"GM", "TOYOTA", "WIA", "°íÀå³­ ¿£Áø"}},
+    {"Brake", {"MANDO", "CONTINENTAL", "BOSCH"}},
+    {"Steering", {"BOSCH", "MOBIS"}}
+<span style = "background-color:#dfd">};</span>
+
+<span style = "background-color:#fdd">shared_ptr&lt;Component&gt; createComponent(const string&amp; category, int index) {
+    string name = componentOptions[category][index];
+    if (category == "CarType") return make_shared&lt;CarType&gt;(name);
+    if (category == "Engine") return make_shared&lt;Engine&gt;(name);
+    if (category == "Brake") return make_shared&lt;Brake&gt;(name);
+    if (category == "Steering") return make_shared&lt;Steering&gt;(name);
+    return nullptr;
+}</span>
+
+<span style = "background-color:#fdd">int getUserInputWithBack(const string&amp; label, const vector&lt;string&gt;&amp; options, bool allowBack) {
+    while (true) {
+        clearScreen();
+        cout &lt;&lt; "\n" &lt;&lt; label &lt;&lt; endl;
+        if (allowBack) cout &lt;&lt; "0. ÀÌÀüÀ¸·Î µ¹¾Æ°¡±â" &lt;&lt; endl;
+        for (int i = 0; i &lt; options.size(); ++i)
+            cout &lt;&lt; i + 1 &lt;&lt; ". " &lt;&lt; options[i] &lt;&lt; endl;
+        cout &lt;&lt; "&gt; ";</span>
+
+<span style = "background-color:#fdd">        string input;
+        getline(cin, input);
+        if (input == "exit") exit(0);</span>
+        try {
+<span style = "background-color:#fdd">            int sel = stoi(input);
+            if (allowBack &amp;&amp; sel == 0) return -1;
+            if (sel &gt;= 1 &amp;&amp; sel &lt;= options.size()) return sel - 1;</span>
+        }
+<span style = "background-color:#fdd">        catch (...) {}
+        cout &lt;&lt; "Àß¸øµÈ ÀÔ·ÂÀÔ´Ï´Ù. ´Ù½Ã ¼±ÅÃÇÏ¼¼¿ä.\n";
+        delay(2000);
+    }
+}</span>
+
+<span style = "background-color:#fdd">void printSelection(const string&amp; category, const string&amp; value) {
+    cout &lt;&lt; category &lt;&lt; "(À¸)·Î " &lt;&lt; value &lt;&lt; "À» ¼±ÅÃÇÏ¼Ì½À´Ï´Ù.\n";
+    delay(2000);
+}</span>
+
+<span style = "background-color:#fdd">void printResult(const Car&amp; car, bool runMode) {
+    string reason;
+    bool success = runMode ? car.canRun(reason) : car.isValid(reason);
+    clearScreen();
+    if (success) cout &lt;&lt; "PASS - ÀÚµ¿Â÷°¡ Á¤»ó µ¿ÀÛÇÕ´Ï´Ù.\n";
+    else cout &lt;&lt; "FAIL - " &lt;&lt; reason &lt;&lt; "\n";
+}</span>
+
+#else
+
+int main() {
+    while (true) {
+        auto car = make_shared&lt;Car&gt;();
+        clearScreen();
+        int sel = getUserInputWithBack("Â÷·® Å¸ÀÔÀ» ¼±ÅÃÇÏ¼¼¿ä:", componentOptions["CarType"], false);
+        car-&gt;carType = dynamic_pointer_cast&lt;CarType&gt;(createComponent("CarType", sel));
+        printSelection("Â÷·® Å¸ÀÔ", car-&gt;carType-&gt;name());
+
+        while (true) {
+            sel = getUserInputWithBack("¿£ÁøÀ» ¼±ÅÃÇÏ¼¼¿ä:", componentOptions["Engine"], true);
+            if (sel == -1) break;
+            car-&gt;engine = dynamic_pointer_cast&lt;Engine&gt;(createComponent("Engine", sel));
+            printSelection("¿£Áø", car-&gt;engine-&gt;name());
+
+            while (true) {
+                sel = getUserInputWithBack("Á¦µ¿ÀåÄ¡¸¦ ¼±ÅÃÇÏ¼¼¿ä:", componentOptions["Brake"], true);
+                if (sel == -1) break;
+                car-&gt;brake = dynamic_pointer_cast&lt;Brake&gt;(createComponent("Brake", sel));
+                printSelection("Á¦µ¿ÀåÄ¡", car-&gt;brake-&gt;name());
+
+                sel = getUserInputWithBack("Á¶ÇâÀåÄ¡¸¦ ¼±ÅÃÇÏ¼¼¿ä:", componentOptions["Steering"], true);
+                if (sel == -1) continue;
+                car-&gt;steering = dynamic_pointer_cast&lt;Steering&gt;(createComponent("Steering", sel));
+                printSelection("Á¶ÇâÀåÄ¡", car-&gt;steering-&gt;name());
+
+                clearScreen();
+
+                while (true) {
+                    cout &lt;&lt; "\n1. ÀÚµ¿Â÷ ½ÇÇà\n2. Á¶ÇÕ Å×½ºÆ®\n0. Ã³À½À¸·Î µ¹¾Æ°¡±â\n&gt; ";
+                    string input; getline(cin, input);
+                    if (input == "0") break;
+                    if (input == "1") printResult(*car, true);
+                    else if (input == "2") printResult(*car, false);
+                }
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
+#endif</pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>
